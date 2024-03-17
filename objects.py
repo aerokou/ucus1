@@ -4,18 +4,18 @@ import time
 import math
 
 class Drone:
-    def __init__ (self, iha, servo_pin):
+    def __init__ (self, iha: connect, servo_pin):
         self.iha = iha
         self.comma = iha.commands
         self.servo_pin = servo_pin
-        self.fire_location = {"x": 0.0, "y": 0.0, "deg": 0.0, "distance": 0.0}
+        self.fire_location = None
         
         self.fire_detected = False
         self.reset()
 
     def reset(self):
         self.fire_detected = False
-        self.fire_location = {"x": 0.0, "y": 0.0, "deg": 0.0, "distance": 0.0}
+        self.fire_location = None
 
     def takeoff(self, alt):
         while self.iha.is_armable is not True:
@@ -24,7 +24,7 @@ class Drone:
         print("IHA ARM edilebilir durumda")
 
         self.iha.mode = VehicleMode("GUIDED")
-        
+
         self.iha.armed = True
 
         while self.iha.armed is not True:
@@ -57,7 +57,7 @@ class Drone:
         servo.value = 1
 
         iha_first_alt = self.iha.location.global_relative_frame.alt
-        self.go_vertical(10)
+        self.go_vertical(8)
 
         time.sleep(3)
 
@@ -87,19 +87,16 @@ class Drone:
         print(f"Yaw açısı {rad} radyan degerine ayarlandı.")
 
 
-    def gorev(self, atesin_konumu: LocationGlobalRelative):
+    def gorev(self):
         print("Alev tespit edildi")
         self.iha.mod_degis("GUIDED")
         # alev_deg = self.fire_location["deg"]
         # alev_dist = self.fire_location["distance"]
 
-        current_alt = self.iha.location.global_relative_frame.alt
-
         # self.set_yaw_deg(alev_deg)
 
-        alev_pos = LocationGlobalRelative(atesin_konumu[0], atesin_konumu[1], atesin_konumu[2])
-        self.go_to(alev_pos)
+        self.go_to(self.fire_location)
 
         self.drop_bomb()
-        self.go_vertical(current_alt)
+
         self.mode_change("RTL")
