@@ -17,8 +17,10 @@ cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, EKRAN[0])
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, EKRAN[1])
 
+SERVO_PIN = 17
+
 drone = connect("/dev/ttyACM0", wait_ready=True, baud=115200)
-iha = objects.Drone(drone)
+iha = objects.Drone(drone, SERVO_PIN)
 iha.mode_change("AUTO")
 
 while iha.fire_detected is False:
@@ -33,6 +35,7 @@ while iha.fire_detected is False:
         ates_pos_ekran = [x+w/2, y+h/2]
 
         iha.fire_location = atesin_konumu(EKRAN, ates_pos_ekran, drone.location.global_relative_frame.alt)
+        atesin_konumu_global(iha.fire_location["x"], iha.fire_location["y"], drone.location.global_relative_frame.lat, drone.location.global_relative_frame.lon)
 
         iha.fire_detected = True
         break

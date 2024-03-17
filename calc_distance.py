@@ -19,6 +19,20 @@ def yawa_donustur(x, y):
 		return 90
 	return 0
 
+def atesin_konumu_global(x, y, drone_x, drone_y):
+	# Hedef konum için enlem ve boylam ofsetlerini hesaplayın
+	north_offset = 10 * sin(drone_x * pi / 180)
+	east_offset = 10 * cos(drone_x * pi / 180)
+
+	# Hedef konumun enlem ve boylamını hesaplayın
+	target_lat = drone_x + north_offset
+	target_lon = drone_y + east_offset
+
+	# Hedef konumun irtifasını mevcut konumla aynı tutun
+	target_alt = current_location.alt
+
+	return target_lat, target_lon, target_alt
+
 def atesin_konumu(ekran_orani, pixel_pos, yukseklik):
 	ekran_x = ekran_orani[0]
 	ekran_y = ekran_orani[1]

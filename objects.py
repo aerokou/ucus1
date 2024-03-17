@@ -4,9 +4,10 @@ import time
 import math
 
 class Drone:
-    def __init__ (self, iha):
+    def __init__ (self, iha, servo_pin):
         self.iha = iha
         self.comma = iha.commands
+        self.servo_pin = servo_pin
         self.fire_location = {"x": 0.0, "y": 0.0, "deg": 0.0, "distance": 0.0}
         
         self.fire_detected = False
@@ -52,15 +53,15 @@ class Drone:
 
     def drop_bomb(self):
         print("Bomba bırakılıyor...")
-        servo = AngularServo(2, min_pulse_width=0.0006, max_pulse_width=0.0023)
-        servo.angle = 90
+        servo = AngularServo(self.servo_pin, min_pulse_width=0.0006, max_pulse_width=0.0023)
+        servo.value = 1
 
         iha_first_alt = self.iha.location.global_relative_frame.alt
-        self.go_vertical(1)
+        self.go_vertical(10)
 
         time.sleep(3)
 
-        servo.angle = -90
+        servo.value = -1
         time.sleep(1)
         print("Bomba bırakıldı yukseliyor...")
         self.go_vertical(iha_first_alt)
@@ -86,17 +87,17 @@ class Drone:
         print(f"Yaw açısı {rad} radyan degerine ayarlandı.")
 
 
-    def gorev(self):
+    def gorev(self, atesin_konumu: LocationGlobalRelative):
         print("Alev tespit edildi")
         self.iha.mod_degis("GUIDED")
-        alev_deg = self.fire_location["deg"]
-        alev_dist = self.fire_location["distance"]
+        # alev_deg = self.fire_location["deg"]
+        # alev_dist = self.fire_location["distance"]
 
         current_alt = self.iha.location.global_relative_frame.alt
 
-        self.set_yaw_deg(alev_deg)
+        # self.set_yaw_deg(alev_deg)
 
-        alev_pos = LocationGlobalRelative(0, alev_dist, current_alt)
+        alev_pos = LocationGlobalRelative(atesin_konumu[0], atesin_konumu[1], atesin_konumu[2])
         self.go_to(alev_pos)
 
         self.drop_bomb()
